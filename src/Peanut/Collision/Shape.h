@@ -1,31 +1,50 @@
 #pragma once
 
-#include "GeometryBase.h"
+#include "BoxGeometry.h"
 #include "Common/Transform.h"
+#include "Math/AABB.h"
 
 namespace Peanut {
 
-	class Shape
+	class ShapeImpl
 	{
 	public:
-		Shape(const Shape& other);
-		Shape(Shape&& other) noexcept;
-		Shape& operator=(const Shape& other);
-		Shape& operator=(Shape&& other) noexcept;
+		ShapeImpl(const ShapeImpl& other);
+		ShapeImpl(ShapeImpl&& other) noexcept;
+		ShapeImpl& operator=(const ShapeImpl& other);
+		ShapeImpl& operator=(ShapeImpl&& other) noexcept;
 
 	public:
-		void SetLocalTransform(const Transform& localTransform) { m_LocalTransform = localTransform; }
 		const Transform& GetLocalTransform() const { return m_LocalTransform; }
+		void SetLocalTransform(const Transform& localTransform)
+		{
+			m_BoundingBox.Translate(localTransform.Location - m_LocalTransform.Location);
+			m_LocalTransform = localTransform;
+		}
 
-		void SetGeometry(const SharedPtr<GeometryBase>& geometry) { m_Geometry = geometry; }
 		const SharedPtr<GeometryBase>& GetGeometry() const { return m_Geometry; }
+		void SetGeometry(const SharedPtr<GeometryBase>& geometry)
+		{
+			m_Geometry = geometry;
+		}
+
+		const AABB& GetBoundingBox() const { return m_BoundingBox; }
 
 	private:
-		Shape(const SharedPtr<GeometryBase>& geometry);
+		void ComputeBoundingBox();
+
+	private:
+		ShapeImpl(const SharedPtr<GeometryBase>& geometry);
 
 	private:
 		Transform m_LocalTransform;
 		SharedPtr<GeometryBase> m_Geometry = nullptr;
+		AABB m_BoundingBox;
+
+		friend class PeanutSDK;
+		friend class ActorBase;
 	};
+
+	using Shape = SharedPtr<ShapeImpl>;
 
 }

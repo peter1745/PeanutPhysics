@@ -2,6 +2,8 @@
 
 #include "Collision/Shape.h"
 
+#include <vector>
+
 namespace Peanut {
 
 	enum class ActorType : int8_t
@@ -14,10 +16,14 @@ namespace Peanut {
 	public:
 		ActorBase(const ActorBase& other);
 		ActorBase(ActorBase&& other) noexcept;
-		virtual ~ActorBase() = default;
+		virtual ~ActorBase();
 
 		ActorBase& operator=(ActorBase&& other) noexcept;
 		ActorBase& operator=(const ActorBase& other);
+
+		void AttachShape(const Shape& shape);
+		Shape FindShapeOfType(GeometryType shapeType) const;
+		void DetachShape(const Shape& shape);
 
 	public:
 		ActorType GetType() const { return m_Type; }
@@ -32,8 +38,8 @@ namespace Peanut {
 		ActorType m_Type = ActorType::None;
 		Transform m_Transform;
 
-		std::vector<SharedPtr<Shape>> m_Shapes;
-		friend class PhysicsWorld;
+		std::vector<Shape> m_Shapes;
+		friend class PhysicsWorldImpl;
 	};
 
 }

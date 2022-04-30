@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ActorBase.h"
+#include "Collision/Shape.h"
 
 namespace Peanut {
 
@@ -26,7 +27,8 @@ namespace Peanut {
 		glm::vec3 m_Velocity = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_Force = { 0.0f, 0.0f, 0.0f };
 
-		friend class PhysicsWorld;
+		friend class PeanutSDK;
+		friend class PhysicsWorldImpl;
 	};
 
 	using DynamicActor = SharedPtr<DynamicActorImpl>;
