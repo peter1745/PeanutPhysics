@@ -8,29 +8,27 @@ namespace Peanut {
 	}
 
 	ActorBase::ActorBase(const ActorBase& other)
-		: m_ActorID(other.m_ActorID), m_Type(other.m_Type), m_Transform(other.m_Transform)
+		: m_Type(other.m_Type), m_Transform(other.m_Transform)
 	{
 	}
 
 	ActorBase::ActorBase(ActorBase&& other) noexcept
 	{
-		m_ActorID = other.m_ActorID;
 		m_Type = other.m_Type;
 		m_Transform = other.m_Transform;
 
-		other.m_ActorID = 0;
 		other.m_Type = ActorType::None;
 		other.m_Transform.SetIdentity();
 	}
 
 	ActorBase::~ActorBase()
 	{
-		m_Shapes.clear();
+		m_Shape = nullptr;
+		//m_Shapes.clear();
 	}
 
 	ActorBase& ActorBase::operator=(const ActorBase& other)
 	{
-		m_ActorID = other.m_ActorID;
 		m_Type = other.m_Type;
 		m_Transform = other.m_Transform;
 		return *this;
@@ -38,51 +36,56 @@ namespace Peanut {
 
 	ActorBase& ActorBase::operator=(ActorBase&& other) noexcept
 	{
-		m_ActorID = other.m_ActorID;
 		m_Type = other.m_Type;
 		m_Transform = other.m_Transform;
 
-		other.m_ActorID = 0;
 		other.m_Type = ActorType::None;
 		other.m_Transform.SetIdentity();
 		return *this;
 	}
 
-	void ActorBase::AttachShape(const Shape& shape)
+	void ActorBase::AttachShape(const Ref<ShapeBaseImpl>& shape)
 	{
-		auto found = std::find(m_Shapes.begin(), m_Shapes.end(), shape);
+		//auto found = std::find(m_Shapes.begin(), m_Shapes.end(), shape);
 
-		if (found != m_Shapes.end())
-		{
-			// TODO(Peter): Log error!
-			return;
-		}
+		//if (found != m_Shapes.end())
+		//{
+		//	// TODO(Peter): Log error!
+		//	return;
+		//}
 
-		m_Shapes.push_back(shape);
+		//m_Shapes.push_back(shape);
+		m_Shape = shape;
 	}
 
-	Shape ActorBase::FindShapeOfType(GeometryType shapeType) const
+	void ActorBase::DetachShape(const Ref<ShapeBaseImpl>& shape)
 	{
-		for (const auto& shape : m_Shapes)
-		{
-			if (shape->GetGeometry()->GetType() == shapeType)
-				return shape;
-		}
+		//auto found = std::find(m_Shapes.begin(), m_Shapes.end(), shape);
 
-		return nullptr;
+		//if (found == m_Shapes.end())
+		//{
+		//	// TODO(Peter): Log error!
+		//	return;
+		//}
+
+		//m_Shapes.erase(found);
+		m_Shape = nullptr;
 	}
 
-	void ActorBase::DetachShape(const Shape& shape)
+	glm::vec3 ActorBase::WorldSpaceToActorSpace(const glm::vec3& worldPoint) const
 	{
-		auto found = std::find(m_Shapes.begin(), m_Shapes.end(), shape);
+		glm::quat inverseOrientation = glm::inverse(m_Transform.Orientation);
+		return glm::rotate(inverseOrientation, worldPoint - GetCenterOfMass());
+	}
 
-		if (found == m_Shapes.end())
-		{
-			// TODO(Peter): Log error!
-			return;
-		}
+	glm::vec3 ActorBase::ActorSpaceToWorldSpace(const glm::vec3& worldPoint) const
+	{
+		return GetCenterOfMass() + glm::rotate(m_Transform.Orientation, worldPoint);
+	}
 
-		m_Shapes.erase(found);
+	glm::vec3 ActorBase::GetCenterOfMass() const
+	{
+		return m_Transform.Location + glm::rotate(m_Transform.Orientation, m_Shape->GetCenterOfMass());
 	}
 
 }

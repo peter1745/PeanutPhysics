@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Collision/Shape.h"
+#include "Common/Ref.h"
+#include "Collision/ShapeBase.h"
 
 #include <vector>
 
@@ -11,7 +12,7 @@ namespace Peanut {
 		None = -1, Static, Dynamic
 	};
 
-	class ActorBase
+	class ActorBase : public RefCounted
 	{
 	public:
 		ActorBase(const ActorBase& other);
@@ -21,9 +22,17 @@ namespace Peanut {
 		ActorBase& operator=(ActorBase&& other) noexcept;
 		ActorBase& operator=(const ActorBase& other);
 
-		void AttachShape(const Shape& shape);
-		Shape FindShapeOfType(GeometryType shapeType) const;
-		void DetachShape(const Shape& shape);
+		void AttachShape(const Ref<ShapeBaseImpl>& shape);
+		void DetachShape(const Ref<ShapeBaseImpl>& shape);
+
+		glm::vec3 WorldSpaceToActorSpace(const glm::vec3& worldPoint) const;
+		glm::vec3 ActorSpaceToWorldSpace(const glm::vec3& worldPoint) const;
+
+		/// <summary>
+		/// Calculates the center of mass of this actor in <b>world space</b>.
+		/// </summary>
+		/// <returns>Center of Mass in World Space</returns>
+		glm::vec3 GetCenterOfMass() const;
 
 	public:
 		ActorType GetType() const { return m_Type; }
@@ -33,12 +42,10 @@ namespace Peanut {
 		ActorBase(ActorType type, const Transform& spawnTransform);
 
 	private:
-		// Would probably be fine having this as 16-bit initially, but in case we want to support >65,535 dynamic actors we'll keep it as 32-bit
-		uint32_t m_ActorID = 0;
 		ActorType m_Type = ActorType::None;
 		Transform m_Transform;
 
-		std::vector<Shape> m_Shapes;
+		Ref<ShapeBaseImpl> m_Shape;
 		friend class PhysicsWorldImpl;
 	};
 

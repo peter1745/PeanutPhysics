@@ -2,50 +2,32 @@
 
 namespace Peanut {
 
-	PeanutSDK::PeanutSDK()
-	{
+	static bool s_SDKCreated = false;
 
+	PhysicsWorld PeanutSDKImpl::CreateWorld(const glm::vec3& gravity)
+	{
+		return PhysicsWorld(new PhysicsWorldImpl(gravity));
 	}
 
-	void PeanutSDK::Release()
+	DynamicActor PeanutSDKImpl::CreateDynamicActor(const Transform& initialTransform)
 	{
-		if (this != s_Instance.get())
+		return DynamicActor(new DynamicActorImpl(initialTransform));
+	}
+
+	BoxShape PeanutSDKImpl::CreateBoxShape(const glm::vec3& halfExtents)
+	{
+		return BoxShape(new BoxShapeImpl(halfExtents));
+	}
+
+	Ref<PeanutSDKImpl> CreateSDK()
+	{
+		if (s_SDKCreated)
 		{
-			// TODO(Peter): Log error!
-			__debugbreak();
-		}
-
-		s_Instance.reset();
-	}
-
-	PhysicsWorld PeanutSDK::CreateWorld(const glm::vec3& gravity)
-	{
-		return MakeShared<PhysicsWorldImpl>(new PhysicsWorldImpl(gravity));
-	}
-
-	DynamicActor PeanutSDK::CreateDynamicActor(const Transform& initialTransform)
-	{
-		return MakeShared<DynamicActorImpl>(new DynamicActorImpl(initialTransform));
-	}
-
-	Shape PeanutSDK::CreateShape(const BoxGeometry& geometry)
-	{
-		return MakeShared<ShapeImpl>(new ShapeImpl(MakeShared<BoxGeometry>(geometry)));
-	}
-
-	SharedPtr<PeanutSDK> PeanutSDK::CreateSDK()
-	{
-		if (s_Instance)
-		{
-			// TODO(Peter): Log Error!
+			// TODO: Log error
 			return nullptr;
 		}
 
-		SharedPtr<PeanutSDK> sdk = MakeShared<PeanutSDK>(new PeanutSDK());
-		s_Instance = sdk;
-		return sdk;
+		s_SDKCreated = true;
+		return PeanutSDK::Create();
 	}
-
-	SharedPtr<PeanutSDK> PeanutSDK::s_Instance;
-
 }

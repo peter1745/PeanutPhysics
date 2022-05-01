@@ -10,19 +10,4 @@
 
 namespace Peanut {
 
-	template<typename T>
-	using SharedPtr = std::shared_ptr<T>;
-
-	template<typename T, typename... TArgs>
-	SharedPtr<T> MakeShared(TArgs&&... args)
-	{
-		return std::make_shared<T>(std::forward<TArgs>(args)...);
-	}
-
-	template<typename T>
-	SharedPtr<T> MakeShared(T* ptr)
-	{
-		return std::shared_ptr<T>(ptr);
-	}
-
 }

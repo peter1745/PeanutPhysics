@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ActorBase.h"
-#include "Collision/Shape.h"
+#include "Collision/ShapeBase.h"
 
 namespace Peanut {
 
@@ -13,24 +13,31 @@ namespace Peanut {
 		DynamicActorImpl& operator=(const DynamicActorImpl& other);
 		DynamicActorImpl& operator=(DynamicActorImpl&& other) noexcept;
 
-		const glm::vec3& GetVelocity() const { return m_Velocity; }
+		void ApplyLinearImpulse(const glm::vec3& impulse);
+
+		const glm::vec3& GetLinearVelocity() const { return m_LinearVelocity; }
 		const glm::vec3& GetForce() const { return m_Force; }
 
-		float GetMass() const { return m_Mass; }
-		void SetMass(float mass) { m_Mass = mass; }
+		float GetMass() const { return 1.0f / m_InverseMass; }
+		void SetMass(float mass) { m_InverseMass = mass > 0.0f ? 1.0f / mass : 0.0f; }
+
+		bool IsGravityDisabled() const { return m_DisableGravity; }
+		void SetGravityDisabled(bool disable) { m_DisableGravity = disable; }
 
 	private:
 		DynamicActorImpl(const Transform& transform);
 
 	private:
-		float m_Mass = 1.0f;
-		glm::vec3 m_Velocity = { 0.0f, 0.0f, 0.0f };
+		float m_InverseMass = 0.0f;
+		glm::vec3 m_LinearVelocity = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_Force = { 0.0f, 0.0f, 0.0f };
 
-		friend class PeanutSDK;
+		bool m_DisableGravity = false;
+
+		friend class PeanutSDKImpl;
 		friend class PhysicsWorldImpl;
 	};
 
-	using DynamicActor = SharedPtr<DynamicActorImpl>;
+	using DynamicActor = Ref<DynamicActorImpl>;
 
 }

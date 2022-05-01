@@ -12,8 +12,8 @@ namespace Peanut {
 
 	AABB::AABB(const AABB& other)
 	{
-		Invalidate();
-		Extend(other);
+		Min = other.Min;
+		Max = other.Max;
 	}
 
 	AABB::AABB(AABB&& other) noexcept

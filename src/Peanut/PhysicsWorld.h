@@ -6,8 +6,26 @@
 
 namespace Peanut {
 
-	class PhysicsWorldImpl
+	struct Contact
 	{
+		glm::vec3 WorldSpacePoint0;
+		glm::vec3 WorldSpacePoint1;
+		glm::vec3 LocalSpacePoint0;
+		glm::vec3 LocalSpacePoint1;
+
+		glm::vec3 Normal;
+		float Distance;
+		float ImpactTime;
+
+		Ref<ActorBase> Actor0;
+		Ref<ActorBase> Actor1;
+	};
+
+	class PhysicsWorldImpl : public RefCounted
+	{
+	private:
+		PhysicsWorldImpl(const glm::vec3& gravity);
+
 	public:
 		~PhysicsWorldImpl();
 
@@ -17,17 +35,15 @@ namespace Peanut {
 		void Simulate(float deltaTime);
 
 	private:
-		PhysicsWorldImpl(const glm::vec3& gravity);
+		void ResolveContact(const Contact& contact) const;
+		bool Intersect(const Ref<ActorBase>& actor0, const Ref<ActorBase>& actor1, Contact& outContact) const;
 
 	private:
-		// NOTE(Peter): Not the same Ref as Hazel! This is just a using of std::shared_ptr for now...
 		std::vector<DynamicActor> m_DynamicActors;
-		uint32_t m_NextActorID = 0;
 		glm::vec3 m_Gravity = { 0.0f, -9.81f, 0.0f };
 
-		friend class PeanutSDK;
+		friend class PeanutSDKImpl;
 	};
 
-	using PhysicsWorld = SharedPtr<PhysicsWorldImpl>;
-
+	using PhysicsWorld = Ref<PhysicsWorldImpl>;
 }

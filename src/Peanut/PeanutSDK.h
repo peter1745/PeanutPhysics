@@ -2,28 +2,20 @@
 
 #include "PhysicsWorld.h"
 #include "Actor/DynamicActor.h"
-#include "Collision/BoxGeometry.h"
+#include "Collision/BoxShape.h"
 
 namespace Peanut {
 
-	class PeanutSDK
+	class PeanutSDKImpl : public RefCounted
 	{
 	public:
-		void Release();
-
 		PhysicsWorld CreateWorld(const glm::vec3& gravity = glm::vec3(0.0f, -9.81f, 0.0f));
 		DynamicActor CreateDynamicActor(const Transform& initialTransform);
-		Shape CreateShape(const BoxGeometry& geometry);
-
-	public:
-		static SharedPtr<PeanutSDK> CreateSDK();
-		static SharedPtr<PeanutSDK> Get() { return s_Instance; }
-
-	private:
-		PeanutSDK();
-
-	private:
-		static SharedPtr<PeanutSDK> s_Instance;
+		BoxShape CreateBoxShape(const glm::vec3& halfExtents);
 	};
+
+	Ref<PeanutSDKImpl> CreateSDK();
+
+	using PeanutSDK = Ref<PeanutSDKImpl>;
 
 }
