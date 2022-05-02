@@ -19,7 +19,12 @@ namespace Peanut {
 		return BoxShape(new BoxShapeImpl(halfExtents));
 	}
 
-	Ref<PeanutSDKImpl> CreateSDK()
+    SphereShape PeanutSDKImpl::CreateSphereShape(const float radius)
+    {
+		return SphereShape(new SphereShapeImpl(radius));
+    }
+
+    Ref<PeanutSDKImpl> CreateSDK()
 	{
 		if (s_SDKCreated)
 		{

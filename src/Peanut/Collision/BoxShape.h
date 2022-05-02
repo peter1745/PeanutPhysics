@@ -19,6 +19,8 @@ namespace Peanut {
 		BoxShapeImpl& operator=(BoxShapeImpl&& other) noexcept;
 		BoxShapeImpl& operator=(const BoxShapeImpl& other);
 
+		virtual void CalculateInertiaTensor() override;
+
 		const glm::vec3& GetHalfExtents() const { return m_HalfExtents; }
 
 	private:

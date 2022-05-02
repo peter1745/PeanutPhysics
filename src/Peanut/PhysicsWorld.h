@@ -8,10 +8,10 @@ namespace Peanut {
 
 	struct Contact
 	{
-		glm::vec3 WorldSpacePoint0;
-		glm::vec3 WorldSpacePoint1;
-		glm::vec3 LocalSpacePoint0;
-		glm::vec3 LocalSpacePoint1;
+		glm::vec3 Point0;
+		glm::vec3 Point1;
+		glm::vec3 LocalPoint0;
+		glm::vec3 LocalPoint1;
 
 		glm::vec3 Normal;
 		float Distance;
@@ -37,6 +37,8 @@ namespace Peanut {
 	private:
 		void ResolveContact(const Contact& contact) const;
 		bool Intersect(const Ref<ActorBase>& actor0, const Ref<ActorBase>& actor1, Contact& outContact) const;
+		bool IntersectBoxToBox(const Ref<ActorBase>& actor0, const Ref<ActorBase>& actor1, Contact& outContact) const;
+		bool IntersectSphereToSphere(const Ref<ActorBase>& actor0, const Ref<ActorBase>& actor1, Contact& outContact) const;
 
 	private:
 		std::vector<DynamicActor> m_DynamicActors;

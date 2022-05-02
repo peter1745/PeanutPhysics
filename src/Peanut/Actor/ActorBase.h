@@ -43,9 +43,11 @@ namespace Peanut {
 
 	private:
 		ActorType m_Type = ActorType::None;
-		Transform m_Transform;
 
+	protected:
+		Transform m_Transform;
 		Ref<ShapeBaseImpl> m_Shape;
+
 		friend class PhysicsWorldImpl;
 	};
 
